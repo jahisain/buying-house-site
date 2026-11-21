@@ -1,0 +1,163 @@
+[
+  {
+    "slug": "knit",
+    "name": "Knitwear",
+    "shortName": "Knit",
+    "headline": "Circular and flat-knit jersey, fleece, pique and activewear",
+    "description": "High-volume precision knitwear manufacturing from basic jersey basics to heavy-gauge brushed fleece and technical activewear.",
+    "productTypes": [
+      "Crewneck & V-Neck T-Shirts",
+      "Pique & Jersey Polo Shirts",
+      "Hoodies & Pullover Sweatshirts",
+      "Joggers & Sweatpants",
+      "Performance Activewear & Leggings",
+      "Sleepwear & Loungewear"
+    ],
+    "fabricsAndTechniques": [
+      "100% Combed Cotton Single Jersey (140 - 240 GSM)",
+      "Cotton/Elastane (Spandex) Stretch Blends",
+      "CVC & TC Blends (60/40, 80/20)",
+      "French Terry, Brushed & Unbrushed Fleece (260 - 450 GSM)",
+      "Cotton Pique (200 - 260 GSM)",
+      "Yarn-dyed engineered stripes, all-over pigment & reactive printing",
+      "Enzyme, silicon, peach-finish and vintage pigment garment washes"
+    ],
+    "typicalMoq": "[1,000 pcs per color/style - confirm with factory]",
+    "typicalLeadTime": "[Sampling: 7-10 days | Bulk: 45-60 days from lab dip approval - confirm]",
+    "qualityFocus": [
+      "Fabric shrinkage control within +/- 3%",
+      "Color fastness to washing (Grade 4+)",
+      "Spirality / skewing testing below 4%",
+      "4-point fabric inspection system prior to spreading"
+    ],
+    "pattern": "weave"
+  },
+  {
+    "slug": "woven",
+    "name": "Woven Garments",
+    "shortName": "Woven",
+    "headline": "Formal shirts, casual poplins, twill trousers, shorts and unlined jackets",
+    "description": "Crisp tailoring and casual woven apparel with meticulous stitch density, clean collar fusing, and reinforced seams.",
+    "productTypes": [
+      "Formal & Business Dress Shirts",
+      "Casual Button-Down Shirts (Poplin, Oxford, Flannel)",
+      "Chino Trousers & Khakis",
+      "Cargo Pants & Utility Shorts",
+      "Overshirts & Shackets",
+      "Chef & Utility Workwear"
+    ],
+    "fabricsAndTechniques": [
+      "100% Cotton Poplin, Twill, Oxford, Canvas & Chambray",
+      "Cotton/Linen and Pure Linen Blends",
+      "Stretch Cotton/Spandex Twills (98/2, 97/3)",
+      "Tencel, Modal & Rayon Woven Viscose",
+      "Wrinkle-free / Easy-care resin finishes",
+      "Enzyme and garment wash finishes for casual drape",
+      "High-density embroidery, mother-of-pearl buttons and contrast gussets"
+    ],
+    "typicalMoq": "[1,200 pcs per style - confirm with factory]",
+    "typicalLeadTime": "[Sampling: 10-14 days | Bulk: 60-75 days depending on fabric milling - confirm]",
+    "qualityFocus": [
+      "Pattern matching across plackets, pockets and yokes",
+      "Interlining bonding peel-strength testing",
+      "Button sew security (minimum 90N pull force)",
+      "Symmetrical collar point execution"
+    ],
+    "pattern": "grid"
+  },
+  {
+    "slug": "denim",
+    "name": "Denim & Jeans",
+    "shortName": "Denim",
+    "headline": "Rigid, stretch, sustainable laundry finishes and authentic vintage washes",
+    "description": "Comprehensive denim production collaborating with Bangladesh's premier denim mills and sustainable eco-wash facilities.",
+    "productTypes": [
+      "Men's & Women's 5-Pocket Jeans (Skinny, Slim, Straight, Wide-leg)",
+      "Classic Trucker & Oversized Denim Jackets",
+      "Denim Western Shirts",
+      "Denim Skirts & Pinafores",
+      "Utility Overalls & Dungarees"
+    ],
+    "fabricsAndTechniques": [
+      "8.5 oz to 14.5 oz Rigid & Stretch Denim",
+      "Ring/Ring, Slub, Cross-hatch and Open-End Yarns",
+      "Sustainable BCI Cotton, Organic Cotton & Recycled Polyester blends",
+      "Eco-washes: Laser whisker processing, ozone bleaching and nano-bubble enzyme washes",
+      "Traditional stone wash, tinting, 3D whisker embossing, hand scraping and destruction",
+      "Cast shades: Pure Indigo, Black-black, Blue-black and Stay-black sulfur dyes"
+    ],
+    "typicalMoq": "[1,500 pcs per style/wash - confirm with factory]",
+    "typicalLeadTime": "[Sampling: 10-14 days | Bulk: 60-75 days - confirm]",
+    "qualityFocus": [
+      "Dry and wet crocking (rubbing) fastness testing",
+      "Tear and tensile strength post-wash verification",
+      "Rivet and shank button pull-test (minimum 90N)",
+      "Waistband and inseam shrinkage calibration"
+    ],
+    "pattern": "crosshatch"
+  },
+  {
+    "slug": "sweaters",
+    "name": "Sweaters & Knitwear",
+    "shortName": "Sweaters",
+    "headline": "Fine to heavy gauge automated flat-bed knitting and fully-fashioned knitwear",
+    "description": "From lightweight summer fine-gauge pullovers to chunky winter cables, utilizing modern computerized flat-bed knitting machines.",
+    "productTypes": [
+      "Crewneck & V-Neck Jumpers",
+      "Button & Zipper Cardigans",
+      "Turtlenecks & Mocknecks",
+      "Chunky Cable-Knit & Fisherman Sweaters",
+      "Knitted Polos & Sleeveless Vests"
+    ],
+    "fabricsAndTechniques": [
+      "Gauges: 3GG, 5GG, 7GG, 12GG and 14GG capabilities",
+      "100% Combed Cotton and BCI Cotton Yarns",
+      "Cotton/Acrylic, Wool/Acrylic and Cashmere-like Blends",
+      "Eco-Vero, Viscose/Nylon and Chenille fancy yarns",
+      "Intarsia, Jacquard, Cable, Milano and Pointelle structures",
+      "Fully-fashioned armholes and neckbands for minimal yarn waste",
+      "Specialty garment softeners and anti-pilling washes"
+    ],
+    "typicalMoq": "[1,000 pcs per style - confirm with factory]",
+    "typicalLeadTime": "[Sampling: 12-16 days | Bulk: 60-80 days - confirm]",
+    "qualityFocus": [
+      "Linking seam strength and elasticity",
+      "Pilling resistance testing (Martindale Grade 3-4+)",
+      "Torque and dimensional stability post-wash",
+      "Yarn knot placement and hidden ends audit"
+    ],
+    "pattern": "weave"
+  },
+  {
+    "slug": "outerwear",
+    "name": "Outerwear & Jackets",
+    "shortName": "Outerwear",
+    "headline": "Technical jackets, quilted puffers, parkas, windbreakers and bonded fleece",
+    "description": "Weatherproof and insulated technical outerwear constructed with seam-sealing, down-proof chambers, and high-performance membranes.",
+    "productTypes": [
+      "Quilted & Puffer Jackets (Synthetic faux down & feather fill)",
+      "Hooded Winter Parkas with faux-fur trims",
+      "Seam-sealed Waterproof Rain Shells",
+      "Bonded Softshell & Polar Fleece Jackets",
+      "Windbreakers & Lightweight Packable Windcheaters",
+      "Utility Vests & Gilets"
+    ],
+    "fabricsAndTechniques": [
+      "Polyester & Nylon Taffeta, Ripstop, Taslan & Oxford weaves",
+      "TPU and PU breathable, waterproof lamination (3k/3k to 10k/10k)",
+      "DWR (Durable Water Repellent) C0 fluorine-free eco-coatings",
+      "Thermal insulation: Recycled polyester wadding, pearl cotton and fake down",
+      "Critical and fully taped seam sealing",
+      "Waterproof reverse-coil zippers, rubberized pullers and storm flaps"
+    ],
+    "typicalMoq": "[800 pcs per style - confirm with factory]",
+    "typicalLeadTime": "[Sampling: 14-18 days | Bulk: 70-90 days - confirm]",
+    "qualityFocus": [
+      "Hydrostatic head water-pressure testing on taped seams",
+      "Down-leakage / feather migration chamber testing",
+      "Cold-crack resistance on laminated membranes",
+      "Zipper cross-pull and slide endurance verification"
+    ],
+    "pattern": "grid"
+  }
+]

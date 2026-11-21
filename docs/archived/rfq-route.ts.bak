@@ -1,0 +1,238 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { Resend } from 'resend';
+import { brand } from '@/config/brand';
+import { rfqFormSchema, MAX_FILE_SIZE_BYTES } from '@/lib/rfq-schema';
+
+export async function POST(request: NextRequest) {
+  try {
+    const formData = await request.formData();
+
+    // 1. Honeypot check for bots
+    const honeypot = formData.get('website_url_hp');
+    if (honeypot && String(honeypot).trim() !== '') {
+      // Silently return success to bot without executing further
+      return NextResponse.json(
+        { success: true, message: 'Inquiry received' },
+        { status: 200 }
+      );
+    }
+
+    // 2. Parse form fields
+    const rawCategories = formData.getAll('categories');
+    const categoriesArray = rawCategories.map((c) => String(c));
+
+    const payload = {
+      name: String(formData.get('name') || ''),
+      company: String(formData.get('company') || ''),
+      email: String(formData.get('email') || ''),
+      phone: String(formData.get('phone') || ''),
+      country: String(formData.get('country') || ''),
+      categories: categoriesArray,
+      styleDescription: String(formData.get('styleDescription') || ''),
+      estimatedQuantity: String(formData.get('estimatedQuantity') || ''),
+      targetPrice: formData.get('targetPrice') ? String(formData.get('targetPrice')) : undefined,
+      targetDeliveryDate: formData.get('targetDeliveryDate') ? String(formData.get('targetDeliveryDate')) : undefined,
+      message: formData.get('message') ? String(formData.get('message')) : undefined,
+      website_url_hp: '',
+      turnstileToken: formData.get('turnstileToken') ? String(formData.get('turnstileToken')) : undefined,
+    };
+
+    // 3. Schema validation with Zod
+    const validationResult = rfqFormSchema.safeParse(payload);
+    if (!validationResult.success) {
+      const issues = validationResult.error.format();
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Validation failed',
+          issues,
+        },
+        { status: 400 }
+      );
+    }
+
+    const validData = validationResult.data;
+
+    // 4. Cloudflare Turnstile Verification (if secret key is set)
+    const turnstileSecret = process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY;
+    if (turnstileSecret) {
+      if (!validData.turnstileToken) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Security challenge verification required. Please try again.',
+          },
+          { status: 400 }
+        );
+      }
+
+      const clientIp =
+        request.headers.get('cf-connecting-ip') ||
+        request.headers.get('x-forwarded-for')?.split(',')[0] ||
+        '';
+
+      const verifyResponse = await fetch(
+        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            secret: turnstileSecret,
+            response: validData.turnstileToken,
+            remoteip: clientIp,
+          }),
+        }
+      );
+
+      const verifyData = await verifyResponse.json();
+      if (!verifyData.success) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Security challenge verification failed. Please refresh and try again.',
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // 5. File Attachment Processing (max 4 MB)
+    const file = formData.get('file') as File | null;
+    let attachment: { filename: string; content: Buffer } | undefined;
+
+    if (file && file.size > 0) {
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `File exceeds maximum allowed size (4 MB). Please send larger tech packs directly to ${brand.email.rfq}`,
+          },
+          { status: 400 }
+        );
+      }
+
+      const arrayBuffer = await file.arrayBuffer();
+      attachment = {
+        filename: file.name,
+        content: Buffer.from(arrayBuffer),
+      };
+    }
+
+    // 6. Email Dispatch via Resend
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const resendFromEmail =
+      process.env.RESEND_FROM_EMAIL || `RFQ Desk <noreply@${brand.domain}>`;
+
+    if (resendApiKey) {
+      const resend = new Resend(resendApiKey);
+
+      // Email 1: Notification to brand RFQ desk
+      const rfqEmailHtml = `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: ${brand.colors.ink};">
+          <h2 style="color: ${brand.colors.primary}; border-bottom: 2px solid ${brand.colors.accent}; padding-bottom: 8px;">
+            New RFQ Submission from ${validData.name} (${validData.company})
+          </h2>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+            <tr><td style="padding: 6px 0; font-weight: bold; width: 180px;">Client Name:</td><td>${validData.name}</td></tr>
+            <tr><td style="padding: 6px 0; font-weight: bold;">Company:</td><td>${validData.company}</td></tr>
+            <tr><td style="padding: 6px 0; font-weight: bold;">Email:</td><td><a href="mailto:${validData.email}">${validData.email}</a></td></tr>
+            <tr><td style="padding: 6px 0; font-weight: bold;">Phone / WhatsApp:</td><td>${validData.phone}</td></tr>
+            <tr><td style="padding: 6px 0; font-weight: bold;">Country:</td><td>${validData.country}</td></tr>
+            <tr><td style="padding: 6px 0; font-weight: bold;">Product Categories:</td><td><strong>${validData.categories.join(', ')}</strong></td></tr>
+            <tr><td style="padding: 6px 0; font-weight: bold;">Estimated Quantity:</td><td>${validData.estimatedQuantity}</td></tr>
+            <tr><td style="padding: 6px 0; font-weight: bold;">Target Price:</td><td>${validData.targetPrice || 'Not specified'}</td></tr>
+            <tr><td style="padding: 6px 0; font-weight: bold;">Target Delivery Date:</td><td>${validData.targetDeliveryDate || 'Not specified'}</td></tr>
+          </table>
+
+          <div style="margin-top: 20px; padding: 14px; background: ${brand.colors.surface}; border-radius: 6px;">
+            <h4 style="margin: 0 0 8px 0; color: ${brand.colors.primary};">Style Description:</h4>
+            <p style="margin: 0; white-space: pre-line;">${validData.styleDescription}</p>
+          </div>
+
+          ${
+            validData.message
+              ? `<div style="margin-top: 14px; padding: 14px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px;">
+                  <h4 style="margin: 0 0 8px 0; color: ${brand.colors.primary};">Additional Comments:</h4>
+                  <p style="margin: 0; white-space: pre-line;">${validData.message}</p>
+                </div>`
+              : ''
+          }
+
+          ${
+            attachment
+              ? `<p style="margin-top: 16px; color: ${brand.colors.primary}; font-weight: bold;">Attached File: ${attachment.filename} (${(file!.size / 1024 / 1024).toFixed(2)} MB)</p>`
+              : '<p style="margin-top: 16px; color: #718096;">No file attached.</p>'
+          }
+        </div>
+      `;
+
+      await resend.emails.send({
+        from: resendFromEmail,
+        to: brand.email.rfq,
+        subject: `[New RFQ] ${validData.company} - ${validData.categories.join(', ')} (${validData.estimatedQuantity})`,
+        html: rfqEmailHtml,
+        replyTo: validData.email,
+        attachments: attachment ? [attachment] : undefined,
+      });
+
+      // Email 2: Confirmation receipt to the sender
+      const confirmationHtml = `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: ${brand.colors.ink}; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: ${brand.colors.primary}; border-bottom: 2px solid ${brand.colors.accent}; padding-bottom: 8px;">
+            Thank you for your inquiry with ${brand.name}
+          </h2>
+          <p>Dear ${validData.name},</p>
+          <p>
+            We have received your Request for Quote (RFQ) regarding <strong>${validData.categories.join(', ')}</strong> sourcing in Bangladesh.
+          </p>
+          <div style="background: ${brand.colors.surface}; padding: 16px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0 0 6px 0;"><strong>Company:</strong> ${validData.company}</p>
+            <p style="margin: 0 0 6px 0;"><strong>Estimated Quantity:</strong> ${validData.estimatedQuantity}</p>
+            <p style="margin: 0;"><strong>Target Delivery:</strong> ${validData.targetDeliveryDate || 'Standard production cycle'}</p>
+          </div>
+          <p>
+            Our Dhaka merchandising and technical team is currently reviewing your specifications and evaluating partner factory capacity. One of our senior merchandisers will follow up with you within 24 business hours.
+          </p>
+          <p style="font-size: 13px; color: #718096; margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+            ${brand.legalName || brand.name} &bull; ${brand.address.city}, ${brand.address.country}<br />
+            Direct inquiries: <a href="mailto:${brand.email.rfq}" style="color: ${brand.colors.accent};">${brand.email.rfq}</a> &bull; Phone: ${brand.phone}
+          </p>
+        </div>
+      `;
+
+      await resend.emails.send({
+        from: resendFromEmail,
+        to: validData.email,
+        subject: `RFQ Received: ${brand.name} Sourcing Evaluation`,
+        html: confirmationHtml,
+      });
+    } else {
+      // In dev or when RESEND_API_KEY is not yet supplied: log cleanly
+      console.log('--- [DEV RFQ SUBMISSION] ---');
+      console.log('Received RFQ payload:', validData);
+      if (attachment) {
+        console.log(`Attachment: ${attachment.filename} (${attachment.content.length} bytes)`);
+      }
+      console.log('--- [END DEV RFQ] ---');
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Your Request for Quote has been successfully submitted. Our Dhaka team will contact you within 24 business hours.',
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error processing RFQ:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'An unexpected server error occurred while processing your request. Please try again or email us directly at ' + brand.email.rfq,
+      },
+      { status: 500 }
+    );
+  }
+}
